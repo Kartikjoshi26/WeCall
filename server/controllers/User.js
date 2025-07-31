@@ -59,6 +59,8 @@ const handleLogin = async (req, res) => {
 
     res.cookie("uid", token, {
       httpOnly: true,
+      secure: true, 
+      sameSite: "None",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -66,7 +68,6 @@ const handleLogin = async (req, res) => {
       success: true,
       User: user,
     });
-
   } catch (error) {
     res.status(500).json({
       success: false,
