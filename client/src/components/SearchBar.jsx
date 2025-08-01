@@ -46,7 +46,7 @@ const SearchBar = ({ onContactAdded, removedEmail, onResetRemovedEmail }) => {
       } else {
         if (res.status === 401) {
           alert("Session expired. Please log in again.");
-          navigate("/UserLogin"); 
+          navigate("/UserLogin");
         }
         setError(data.message || "User not found");
       }
@@ -82,7 +82,7 @@ const SearchBar = ({ onContactAdded, removedEmail, onResetRemovedEmail }) => {
       } else {
         if (res.status === 401) {
           alert("Session expired. Please log in again.");
-          navigate("/UserLogin"); 
+          navigate("/UserLogin");
         }
         setError(data.message || "Failed to add user");
       }
@@ -94,6 +94,7 @@ const SearchBar = ({ onContactAdded, removedEmail, onResetRemovedEmail }) => {
 
   const handleCross = () => {
     setResults([]);
+    setText("");
     setcross(false);
   };
 
@@ -101,7 +102,7 @@ const SearchBar = ({ onContactAdded, removedEmail, onResetRemovedEmail }) => {
     <div className="p-4 max-w-xl mx-auto w-full">
       <form
         onSubmit={handleSearch}
-        className="flex flex-col sm:flex-row items-center gap-2 mb-4"
+        className="flex items-center gap-2 mb-4 flex-wrap sm:flex-nowrap"
       >
         <SearchIcon className="h-5 w-5 text-gray-400" />
 
@@ -111,8 +112,9 @@ const SearchBar = ({ onContactAdded, removedEmail, onResetRemovedEmail }) => {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Enter user name or email"
-          className="flex-1 px-4 py-2 border border-gray-400 rounded-md w-full"
+          className="flex-1 px-4 py-2 border border-gray-400 rounded-md min-w-[180px]"
         />
+
         <button
           type="submit"
           disabled={isLoading}
@@ -136,18 +138,18 @@ const SearchBar = ({ onContactAdded, removedEmail, onResetRemovedEmail }) => {
           {results.map((user, idx) => (
             <li
               key={idx}
-              className="flex flex-col sm:flex-row items-start sm:items-center justify-between border border-gray-300 p-3 rounded-md"
+              className="flex flex-col sm:flex-row sm:items-center justify-between border border-gray-300 p-3 rounded-md"
             >
-              <span className="text-gray-800">
+              <span className="text-gray-800 text-sm sm:text-base">
                 👤 <strong className="font-bold">{user.name}</strong> (
-                <span className="text-xs">{user.email}</span>)
+                <span className="text-xs break-all">{user.email}</span>)
               </span>
               {user.alreadyAdded ? (
-                <p className="text-green-600 mt-1 sm:mt-0">Already Added</p>
+                <p className="text-green-600 mt-2 sm:mt-0"> Added</p>
               ) : (
                 <button
                   onClick={() => handleAdd(user.email)}
-                  className="px-3 py-1 bg-green-600 text-white rounded-md mt-1 sm:mt-0"
+                  className="px-3 py-1 bg-green-600 text-white rounded-md mt-2 sm:mt-0 w-full sm:w-auto"
                 >
                   Add
                 </button>

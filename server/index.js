@@ -135,7 +135,6 @@ io.on("connection", (socket) => {
   // Caller creates and sends offer
   socket.on("offer-created", ({ roomId, calleeEmail, offer }) => {
     const calleeSocketId = userSocketMap[calleeEmail];
-
     if (calleeSocketId) {
       io.to(calleeSocketId).emit("offer-received", {
         callerEmail: socket.email,
@@ -148,7 +147,6 @@ io.on("connection", (socket) => {
   // Callee creates and sends answer
   socket.on("answer-created", ({ roomId, callerEmail, answer }) => {
     const callerSocketId = userSocketMap[callerEmail];
-
     if (callerSocketId) {
       io.to(callerSocketId).emit("answer-received", {
         calleeEmail: socket.email,
@@ -161,7 +159,6 @@ io.on("connection", (socket) => {
   // Handle ICE candidates exchange
   socket.on("ice-candidate", ({ roomId, targetEmail, candidate }) => {
     const targetSocketId = userSocketMap[targetEmail];
-
     if (targetSocketId) {
       io.to(targetSocketId).emit("ice-candidate", {
         fromEmail: socket.email,

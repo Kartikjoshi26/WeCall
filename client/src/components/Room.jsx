@@ -29,6 +29,7 @@ const Room = () => {
     remoteId,
     setRoomId,
     setRemoteId,
+    resetPeer,
   } = usePeer();
 
   const {
@@ -102,7 +103,6 @@ const Room = () => {
 
       try {
         await setRemoteAns(answer);
-
       } catch (error) {
         console.error("Error setting remote answer:", error);
         alert("Something went wrong");
@@ -115,7 +115,6 @@ const Room = () => {
   // Handle ICE candidates
   const handleIceCandidate = useCallback(
     async ({ candidate }) => {
-
       try {
         await addIceCandidate(candidate);
       } catch (error) {
@@ -141,9 +140,13 @@ const Room = () => {
     setMyStream(null);
     setRemoteUser("");
     setRemoteStream(null);
-    alert("Call ended.");
+    if (myStream) {
+      myStream.getTracks().forEach((track) => track.stop());
+      setMyStream(null);
+    }
+    resetPeer();
     navigate(`/User`);
-  }, [roomId, remoteUser, socket, peer]);
+  }, [roomId, remoteUser, socket]);
 
   // handle remote hangup button
   const handleUserHangUp = useCallback(
@@ -152,15 +155,25 @@ const Room = () => {
       setMyStream(null);
       setRemoteUser("");
       setRemoteStream(null);
+      if (myStream) {
+        myStream.getTracks().forEach((track) => track.stop());
+        setMyStream(null);
+      }
+      resetPeer();
       navigate(`/User`);
     },
-    [remoteUser, roomId, socket, peer]
+    [remoteUser, roomId, socket]
   );
 
   const handleUserRefresh = useCallback(({ message }) => {
     alert(`${message} or disconnected, please try again`);
     setRemoteStream(null);
     setRemoteUser("");
+    if (myStream) {
+      myStream.getTracks().forEach((track) => track.stop());
+      setMyStream(null);
+    }
+    resetPeer();
     navigate("/User");
   });
 
@@ -174,10 +187,11 @@ const Room = () => {
   // peer connection event listeners
   useEffect(() => {
     // Listen for remote tracks
-    peer.addEventListener("track", handleTrackEvent);
+    peer.current.addEventListener("track", handleTrackEvent);
 
     // Handle ICE candidates
-    peer.onicecandidate = (event) => {
+
+    peer.current.onicecandidate = (event) => {
       if (event.candidate && remoteUser) {
         socket.emit("ice-candidate", {
           roomId,
@@ -188,10 +202,10 @@ const Room = () => {
     };
 
     return () => {
-      peer.removeEventListener("track", handleTrackEvent);
-      peer.onicecandidate = null;
+      peer.current.removeEventListener("track", handleTrackEvent);
+      peer.current.onicecandidate = null;
     };
-  }, [peer, socket, roomId, remoteUser, handleTrackEvent]);
+  }, [socket, roomId, remoteUser, handleTrackEvent]);
 
   // Setup socket event listeners
   useEffect(() => {
@@ -219,6 +233,7 @@ const Room = () => {
     // user not-active or unavailable
     socket.on("user-unavailable", handleUserUnavailable);
 
+    // user reject the call
     socket.on("user-reject", ({ calleeUser }) => {
       clearTimeout(calleeTimeoutRef.current);
       alert(`${calleeUser} has rejected your call `);
@@ -228,6 +243,7 @@ const Room = () => {
       navigate("/User");
     });
 
+    //user refresh the room page
     socket.on("user-refresh", handleUserRefresh);
 
     return () => {
@@ -260,6 +276,11 @@ const Room = () => {
   useEffect(() => {
     if (!roomId || !contextStream) {
       alert("You refreshed or lost the session. Returning to dashboard.");
+      if (myStream) {
+        myStream.getTracks().forEach((track) => track.stop());
+        setMyStream(null);
+      }
+      resetPeer();
       navigate("/User");
     }
   }, [roomId, contextStream]);
@@ -280,9 +301,14 @@ const Room = () => {
         setMyStream(null);
         setRemoteStream(null);
         setRemoteUser("");
+        if (myStream) {
+          myStream.getTracks().forEach((track) => track.stop());
+          setMyStream(null);
+        }
+        resetPeer();
       }
     };
-  }, [hangUp, peer]);
+  }, [hangUp]);
 
   useEffect(() => {
     const handleUnloadOrBack = () => {
@@ -296,6 +322,11 @@ const Room = () => {
             targetEmail: remoteUser,
           });
         }
+        if (myStream) {
+          myStream.getTracks().forEach((track) => track.stop());
+          setMyStream(null);
+        }
+        resetPeer();
         sethangUp(false);
       }
     };
@@ -305,7 +336,7 @@ const Room = () => {
     return () => {
       window.removeEventListener("beforeunload", handleUnloadOrBack);
     };
-  }, [socket, hangUp]); 
+  }, [socket, hangUp]);
 
   const toggleAudio = () => {
     if (myStream) {
@@ -354,6 +385,11 @@ const Room = () => {
         setRemoteName(null);
         setMyStream(null);
         setRemoteStream(null);
+        if (myStream) {
+          myStream.getTracks().forEach((track) => track.stop());
+          setMyStream(null);
+        }
+        resetPeer();
 
         localStorage.removeItem("roomId");
         localStorage.removeItem("remoteUser");

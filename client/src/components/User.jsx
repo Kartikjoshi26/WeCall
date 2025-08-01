@@ -32,7 +32,8 @@ const User = () => {
     setRemoteId,
   } = usePeer();
   const { socket, connectSocket, disconnectSocket } = useSocket();
-  const { list, setlist, remoteName, setMyName, setRemoteName } = useUser();
+  const { list, setlist, remoteName, myname, setMyName, setRemoteName } =
+    useUser();
 
   const navigate = useNavigate();
 
@@ -55,11 +56,11 @@ const User = () => {
       "incoming-call",
       ({ callerEmail, callerName, roomId }) => {
         setIncomingCall({ callerEmail, callerName, roomId });
-        setRemoteName(callerName); 
+        setRemoteName(callerName);
         const isInContacts = usersRef.current.some(
           (user) => user.email === callerEmail
         );
-        setUserInContacts(isInContacts); 
+        setUserInContacts(isInContacts);
         settoggle(false);
       }
     );
@@ -86,7 +87,7 @@ const User = () => {
         if (!res.ok) {
           if (res.status === 401) {
             alert("Session expired. Please log in again.");
-            navigate("/UserLogin"); 
+            navigate("/UserLogin");
           }
           setError(data.message || "Failed to fetch users");
           throw new Error("Failed to fetch users");
@@ -94,7 +95,7 @@ const User = () => {
 
         setUsers(data.message_data.contacts);
         setuser(data.message_data.userName);
-        setMyName(data.message_data.userName.name); 
+        setMyName(data.message_data.userName.name);
       } catch (err) {
         setError(err.message);
       }
@@ -119,7 +120,7 @@ const User = () => {
           settoggle(false);
         } else {
           settoggle(true);
-          setRemoteName(userName); 
+          setRemoteName(userName);
           const roomId = uuidv4();
           setRoomId(roomId);
           setRemoteId(calleeEmail);
@@ -156,28 +157,36 @@ const User = () => {
   };
 
   const handleRemove = useCallback(async (email) => {
-    const res = await fetch(`${apiUrl}/api/remove`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include",
-      body: JSON.stringify({ email: email }),
-    });
+    try {
+      const res = await fetch(`${apiUrl}/api/remove`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ email: email }),
+      });
 
-    const data = await res.json();
-
-
-    if (res.ok && data.success) {
-      alert("User removed from the Contact List");
-      setIsAdded((prev) => !prev); 
-      setRecentlyRemovedEmail(email);
-    } else {
-      if (res.status === 401) {
-        alert("Session expired. Please log in again.");
-        navigate("/UserLogin"); 
+      let data = {};
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        console.error("Failed to parse response JSON:", jsonErr);
       }
-      setError(data.message || "Failed to remove user");
+
+      if (res.ok && data.success) {
+        alert("User removed from the Contact List");
+        setIsAdded((prev) => !prev);
+        setRecentlyRemovedEmail(email);
+      } else {
+        if (res.status === 401) {
+          alert("Session expired. Please log in again.");
+          navigate("/UserLogin");
+        }
+        setError(data.message || "Failed to remove user");
+      }
+    } catch (error) {
+      console.log("Something went wrong ", error);
     }
   }, []);
 
@@ -186,7 +195,7 @@ const User = () => {
     try {
       Socket.current.emit("user-reject", {
         callerUser: incomingCall.callerEmail,
-        calleeUser: user.email,
+        calleeUser: myname,
       });
     } catch (error) {
       setError("Something went wrong, try again after sometime");
@@ -229,11 +238,13 @@ const User = () => {
                 {users.map((user, idx) => (
                   <li
                     key={idx}
-                    className="flex flex-col sm:flex-row sm:items-center justify-between bg-cyan-100 p-3 rounded-md"
+                    className="bg-cyan-100 p-3 rounded-md flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between"
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <UserIcon className="h-5 w-5 text-gray-700" />
-                      <strong className="text-gray-900">{user.name}</strong>
+                      <span className="font-semibold text-gray-900">
+                        {user.name}
+                      </span>
                       <span
                         className={`text-sm ${
                           list.includes(user.email)
@@ -244,11 +255,12 @@ const User = () => {
                         ● {list.includes(user.email) ? "Active" : "Offline"}
                       </span>
                     </div>
-                    <div className="mt-2 sm:mt-0 flex gap-3">
+
+                    <div className="flex gap-2 justify-start sm:justify-end">
                       <button
                         onClick={() => handleCall(user.name, user.email)}
                         disabled={toggle}
-                        className="text-emerald-700 bg-emerald-300 px-4 py-1  rounded-md hover:bg-emerald-200"
+                        className="text-white bg-green-500 px-3 py-1 rounded-md text-sm hover:bg-green-600"
                       >
                         {toggle && user.name == remoteName
                           ? "Calling..."
@@ -256,7 +268,7 @@ const User = () => {
                       </button>
                       <button
                         onClick={() => handleRemove(user.email)}
-                        className="text-red-700 bg-red-400 px-4 py-1 rounded-md hover:bg-red-300"
+                        className="text-white bg-red-500 px-3 py-1 rounded-md text-sm hover:bg-red-600"
                       >
                         Remove
                       </button>
@@ -271,7 +283,7 @@ const User = () => {
         <div className="text-center">
           <button
             onClick={handleLogOut}
-            className="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-900"
+            className="bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-900 max-w-fit mx-auto"
           >
             Log Out
           </button>
