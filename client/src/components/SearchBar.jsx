@@ -102,7 +102,7 @@ const SearchBar = ({ onContactAdded, removedEmail, onResetRemovedEmail }) => {
     <div className="p-4 max-w-xl mx-auto w-full">
       <form
         onSubmit={handleSearch}
-        className="flex items-center gap-2 mb-4 flex-wrap sm:flex-nowrap"
+        className="flex items-center gap-2 mb-4 flex-wrap sm:flex-nowrap  xs:flex-row"
       >
         <SearchIcon className="h-5 w-5 text-gray-400" />
 
@@ -118,7 +118,7 @@ const SearchBar = ({ onContactAdded, removedEmail, onResetRemovedEmail }) => {
         <button
           type="submit"
           disabled={isLoading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-60"
+          className="px-4 py-2 bg-blue-600 text-white rounded-md disabled:opacity-60 xs:w-auto flex-shrink-0"
         >
           {isLoading ? "Searching..." : "Search"}
         </button>

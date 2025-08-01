@@ -137,45 +137,57 @@ const Room = () => {
     socket.emit("hang-up", { roomId, remoteUser, myname });
     sethangUp(true);
     hangUpRef.current = true;
-    setMyStream(null);
-    setRemoteUser("");
-    setRemoteStream(null);
     if (myStream) {
       myStream.getTracks().forEach((track) => track.stop());
       setMyStream(null);
     }
+    setRemoteUser("");
+    if (remoteStream) {
+      remoteStream.getTracks().forEach((track) => track.stop());
+      setRemoteStream(null);
+    }
+
     resetPeer();
     navigate(`/User`);
-  }, [roomId, remoteUser, socket]);
+  }, [roomId, remoteUser, socket, myStream]);
 
   // handle remote hangup button
   const handleUserHangUp = useCallback(
     ({ myname }) => {
       alert(`User ${myname} has hung up.`);
-      setMyStream(null);
-      setRemoteUser("");
-      setRemoteStream(null);
       if (myStream) {
         myStream.getTracks().forEach((track) => track.stop());
         setMyStream(null);
       }
+      setRemoteUser("");
+      if (remoteStream) {
+        remoteStream.getTracks().forEach((track) => track.stop());
+        setRemoteStream(null);
+      }
+
       resetPeer();
       navigate(`/User`);
     },
-    [remoteUser, roomId, socket]
+    [remoteUser, roomId, socket, myStream]
   );
 
-  const handleUserRefresh = useCallback(({ message }) => {
-    alert(`${message} or disconnected, please try again`);
-    setRemoteStream(null);
-    setRemoteUser("");
-    if (myStream) {
-      myStream.getTracks().forEach((track) => track.stop());
-      setMyStream(null);
-    }
-    resetPeer();
-    navigate("/User");
-  });
+  const handleUserRefresh = useCallback(
+    ({ message }) => {
+      alert(`${message} or disconnected, please try again`);
+      if (myStream) {
+        myStream.getTracks().forEach((track) => track.stop());
+        setMyStream(null);
+      }
+      if (remoteStream) {
+        remoteStream.getTracks().forEach((track) => track.stop());
+        setRemoteStream(null);
+      }
+
+      setRemoteUser("");
+      resetPeer();
+      navigate("/User");
+    },
+  );
 
   const handleUserUnavailable = useCallback(() => {
     alert("User unavailable this time, call later");
@@ -278,12 +290,17 @@ const Room = () => {
       alert("You refreshed or lost the session. Returning to dashboard.");
       if (myStream) {
         myStream.getTracks().forEach((track) => track.stop());
-        setMyStream(null);
       }
+      setMyStream(null);
+      if (remoteStream) {
+        remoteStream.getTracks().forEach((track) => track.stop());
+        setRemoteStream(null);
+      }
+
       resetPeer();
       navigate("/User");
     }
-  }, [roomId, contextStream]);
+  }, [roomId, contextStream, myStream]);
 
   useEffect(() => {
     return () => {
@@ -298,13 +315,16 @@ const Room = () => {
           });
         }
 
+        myStream?.getTracks().forEach((track) => track.stop());
         setMyStream(null);
-        setRemoteStream(null);
+
+        
+          remoteStream?.getTracks().forEach((track) => track.stop());
+          setRemoteStream(null);
+        
+
         setRemoteUser("");
-        if (myStream) {
-          myStream.getTracks().forEach((track) => track.stop());
-          setMyStream(null);
-        }
+
         resetPeer();
       }
     };
@@ -322,10 +342,15 @@ const Room = () => {
             targetEmail: remoteUser,
           });
         }
-        if (myStream) {
-          myStream.getTracks().forEach((track) => track.stop());
-          setMyStream(null);
-        }
+
+        myStream?.getTracks().forEach((track) => track.stop());
+        setMyStream(null);
+
+        
+          remoteStream?.getTracks().forEach((track) => track.stop());
+          setRemoteStream(null);
+        
+
         resetPeer();
         sethangUp(false);
       }
@@ -383,12 +408,15 @@ const Room = () => {
         setRemoteId(null);
         setRoomId(null);
         setRemoteName(null);
-        setMyStream(null);
-        setRemoteStream(null);
         if (myStream) {
           myStream.getTracks().forEach((track) => track.stop());
           setMyStream(null);
         }
+        if (remoteStream) {
+          remoteStream.getTracks().forEach((track) => track.stop());
+          setRemoteStream(null);
+        }
+
         resetPeer();
 
         localStorage.removeItem("roomId");
