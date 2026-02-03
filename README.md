@@ -126,7 +126,3 @@ Vite enables fast HMR during development
 - Passwords are hashed using bcrypt
 - Authentication handled via JWT
 
-
-👨‍💻 Author
-Kartik Joshi
-GitHub: @Kartikjoshi26
