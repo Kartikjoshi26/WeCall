@@ -63,6 +63,7 @@ wecall/
 ```bash
 git clone https://github.com/Kartikjoshi26/WeCall.git
 cd WeCall/app_call
+```
 
 2️-  Backend Setup (Server)
 cd server
