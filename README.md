@@ -20,9 +20,9 @@ The project is built with a **React + Vite frontend** and a **Node.js + Socket.I
 
 ##  Project Structure
 wecall/
-  └── app_call/
-  ├── client/ # Frontend (React + Vite + WebRTC)
-  ├── server/ # Backend (Node.js + Socket.IO + MongoDB)
+└── app_call/
+    ├── client/   # Frontend (React + Vite + WebRTC)
+    └── server/   # Backend (Node.js + Socket.IO + MongoDB)
 
 ---
 
@@ -72,9 +72,9 @@ npm install
 
 Create a .env file in server/:
 
--PORT=5000
--MONGO_URI=mongodb://localhost:27017/wecall
--CLIENT_URL=http://localhost:5173
+- PORT=5000
+- MONGO_URI=mongodb://localhost:27017/wecall
+- CLIENT_URL=http://localhost:5173
 
 
 Start the server:
