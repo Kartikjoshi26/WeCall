@@ -17,14 +17,15 @@ The project is built with a **React + Vite frontend** and a **Node.js + Socket.I
 
 ---
 
+
 ##  Project Structure
 wecall/
-└── app_call/
-├── client/ # Frontend (React + Vite + WebRTC)
-├── server/ # Backend (Node.js + Socket.IO + MongoDB)
-
+  └── app_call/
+  ├── client/ # Frontend (React + Vite + WebRTC)
+  ├── server/ # Backend (Node.js + Socket.IO + MongoDB)
 
 ---
+
 
 ## Tech Stack
 
@@ -58,7 +59,7 @@ wecall/
 
 ## Installation & Setup
 
-### 1️- Clone the Repository
+1️- Clone the Repository
 ```bash
 git clone https://github.com/Kartikjoshi26/WeCall.git
 cd WeCall/app_call
