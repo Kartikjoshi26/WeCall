@@ -72,9 +72,9 @@ npm install
 
 Create a .env file in server/:
 
-PORT=5000
-MONGO_URI=mongodb://localhost:27017/wecall
-CLIENT_URL=http://localhost:5173
+-PORT=5000
+-MONGO_URI=mongodb://localhost:27017/wecall
+-CLIENT_URL=http://localhost:5173
 
 
 Start the server:
@@ -96,7 +96,7 @@ Frontend runs on:
 
 http://localhost:5173
 
-🔄 How It Works
+## 🔄 How It Works
 
 Users are identified and stored in MongoDB
 
